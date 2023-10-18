@@ -4,6 +4,10 @@ import com.marnikkamil.store.common.LoggedUserGetter;
 import com.marnikkamil.store.order.dto.NewOrderDto;
 import com.marnikkamil.store.order.dto.OrderDto;
 import com.marnikkamil.store.order.exception.InsufficientPermissionsException;
+import com.marnikkamil.store.order.exception.InvalidOrderDataException;
+import com.marnikkamil.store.supplier.domain.SupplierFacade;
+import com.marnikkamil.store.supplier.dto.FoodDto;
+import com.marnikkamil.store.supplier.dto.SupplierMenuDto;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,17 +15,34 @@ import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderFacade {
 
+  SupplierFacade supplierFacade;
   OrderRepository orderRepository;
 
   public OrderDto addOrder(NewOrderDto newOrder) {
     if (newOrder == null) {
-      newOrder = NewOrderDto.withNewId();
+      throw new InvalidOrderDataException();
     }
-    return orderRepository.save(new Order(newOrder.getId(), LoggedUserGetter.getLoggedUserId()))
+    final Map<String, FoodDto> existingFoodByIds = supplierFacade.getSupplierMenu(newOrder.getSupplierId())
+        .getMenu()
+        .stream()
+        .collect(Collectors.toMap(FoodDto::getId, Function.identity()));
+    final List<OrderedFood> orderedFood = newOrder.getFood().stream()
+        .filter(food -> existingFoodByIds.containsKey(food.getFoodId()))
+        .map(food -> {
+          final FoodDto foodDto = existingFoodByIds.get(food.getFoodId());
+          return new OrderedFood(food.getFoodId(), new AmountOfFood(food.getAmountOfFood()), foodDto.getPrice());
+        }).collect(Collectors.toList());
+
+    return orderRepository.save(new Order(newOrder.getId(), LoggedUserGetter.getLoggedUserId(), orderedFood))
         .dto();
   }
 
@@ -32,7 +53,7 @@ public class OrderFacade {
   }
 
   public Page<OrderDto> listOrdersCreatedBy(String userId) {
-    if (!LoggedUserGetter.isAdmin()) {
+    if (!LoggedUserGetter.isAdmin() && !LoggedUserGetter.getLoggedUserId().equals(userId)) {
       throw InsufficientPermissionsException.canNotListOrdersCreatedByOthers(LoggedUserGetter.getLoggedUserId());
     }
     return orderRepository.findAllByCreatedById(new ObjectId(userId), PageRequest.of(0, 10))

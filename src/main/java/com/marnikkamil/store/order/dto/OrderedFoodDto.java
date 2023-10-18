@@ -2,20 +2,18 @@ package com.marnikkamil.store.order.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public final class NewOrderDto {
+public final class OrderedFoodDto {
 
-  String id;
-  String supplierId;
-  List<FoodToOrderDto> food;
+  String foodId;
+  int amountOfFood;
+  double price;
 
 }

@@ -24,7 +24,7 @@ class OrderController {
   }
 
   @PostMapping("/")
-  ResponseEntity<OrderDto> createOrder(@RequestBody(required = false) NewOrderDto newOrder) {
+  ResponseEntity<OrderDto> createOrder(@RequestBody NewOrderDto newOrder) {
     return ResponseEntity.ok(orderFacade.addOrder(newOrder));
   }
 

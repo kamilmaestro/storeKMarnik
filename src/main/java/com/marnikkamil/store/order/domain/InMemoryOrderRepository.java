@@ -15,11 +15,7 @@ final class InMemoryOrderRepository implements OrderRepository {
 
   @Override
   public Order save(Order order) {
-    if (order.getId() == null) {
-      order.setId(new ObjectId());
-    }
     values.put(order.getId(), order);
-
     return order;
   }
 

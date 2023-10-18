@@ -1,18 +1,19 @@
 package com.marnikkamil.store.order.domain;
 
+import com.marnikkamil.store.supplier.domain.SupplierFacade;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 class OrderConfiguration {
 
-  OrderFacade orderFacade() {
-    return orderFacade(new InMemoryOrderRepository());
+  OrderFacade orderFacade(SupplierFacade supplierFacade) {
+    return orderFacade(supplierFacade, new InMemoryOrderRepository());
   }
 
   @Bean
-  OrderFacade orderFacade(OrderRepository orderRepository) {
-    return new OrderFacade(orderRepository);
+  OrderFacade orderFacade(SupplierFacade supplierFacade, OrderRepository orderRepository) {
+    return new OrderFacade(supplierFacade, orderRepository);
   }
 
 }
