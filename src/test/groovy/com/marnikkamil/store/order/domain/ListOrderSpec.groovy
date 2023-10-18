@@ -1,4 +1,4 @@
-package com.marnikkamil.store.order
+package com.marnikkamil.store.order.domain
 
 import com.marnikkamil.store.SecurityContextProvider
 import com.marnikkamil.store.order.domain.OrderFacade
@@ -12,7 +12,7 @@ import spock.lang.Unroll
 
 class ListOrderSpec extends Specification implements SampleOrders, SampleSubjects, SecurityContextProvider {
 
-  private OrderFacade orderFacade = new OrderFacade()
+  private OrderFacade orderFacade = new OrderConfiguration().orderFacade()
   private OrderDto firstJohnOrder
   private OrderDto secondJohnOrder
   private OrderDto kevinOrder
@@ -50,7 +50,7 @@ class ListOrderSpec extends Specification implements SampleOrders, SampleSubject
   }
 
   @Unroll
-  def "admin should list orders of a specified user" () {
+  def "admin should list orders created by a specified user" () {
     expect: "$ADMIN gets orders created by $createdBy"
       orderFacade.listOrdersCreatedBy(createdBy.userId).sort() == orders.sort()
     where:

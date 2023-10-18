@@ -3,6 +3,8 @@ package com.marnikkamil.store.order.infrastructure;
 import com.marnikkamil.store.order.domain.OrderFacade;
 import com.marnikkamil.store.order.dto.NewOrderDto;
 import com.marnikkamil.store.order.dto.OrderDto;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -10,9 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/order")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class OrderController {
 
-  private final OrderFacade orderFacade;
+  OrderFacade orderFacade;
 
   @Autowired
   public OrderController(OrderFacade orderFacade) {
@@ -20,7 +24,7 @@ class OrderController {
   }
 
   @PostMapping("/")
-  ResponseEntity<OrderDto> createOrder(@RequestBody NewOrderDto newOrder) {
+  ResponseEntity<OrderDto> createOrder(@RequestBody(required = false) NewOrderDto newOrder) {
     return ResponseEntity.ok(orderFacade.addOrder(newOrder));
   }
 

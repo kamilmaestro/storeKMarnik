@@ -1,16 +1,16 @@
-package com.marnikkamil.store.order
+package com.marnikkamil.store.order.domain
 
 import com.marnikkamil.store.SecurityContextProvider
-import com.marnikkamil.store.order.domain.OrderFacade
 import com.marnikkamil.store.order.dto.NewOrderDto
 import com.marnikkamil.store.order.dto.OrderDto
+import com.marnikkamil.store.order.exception.InsufficientPermissionsException
 import com.marnikkamil.store.samples.SampleOrders
 import com.marnikkamil.store.samples.SampleSubjects
 import spock.lang.Specification
 
 class DeleteOrderSpec extends Specification implements SampleOrders, SampleSubjects, SecurityContextProvider {
 
-  private OrderFacade orderFacade = new OrderFacade()
+  private OrderFacade orderFacade = new OrderConfiguration().orderFacade()
 
   void setup() {
     given: "$ADMIN is logged in"
@@ -27,12 +27,13 @@ class DeleteOrderSpec extends Specification implements SampleOrders, SampleSubje
   }
 
   def "customer should not be able to delete an order" () {
-    given: "there is an order"
+    given: "there is an order created by $KEVIN"
+      logInUser(KEVIN)
       OrderDto order = orderFacade.addOrder(new NewOrderDto(ADMIN_ORDER_ID))
-    when: "deletes order"
+    when: "$KEVIN deletes his order"
       orderFacade.deleteOrder(order.id)
-    then: "order does not exist anymore"
-      orderFacade.listOrders().isEmpty()
+    then: "$KEVIN does not have permissions to delete orders"
+      thrown(InsufficientPermissionsException)
   }
 
 }
