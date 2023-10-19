@@ -1,12 +1,5 @@
 version: "3.8"
 services:
-#  spring-app:
-#    image: store:latest
-#    container_name: store
-#    ports:
-#      - 8080:8080
-#    depends_on:
-#      - mongodb
   mongodb:
     image: mongo
     container_name: mongodb
