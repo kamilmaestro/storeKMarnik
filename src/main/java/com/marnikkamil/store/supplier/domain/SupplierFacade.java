@@ -19,7 +19,7 @@ public class SupplierFacade {
   FoodCreator foodCreator;
 
   public SupplierDto addSupplier(AddSupplierDto addSupplier) {
-    Supplier toSave = supplierCreator.from(addSupplier);
+    final Supplier toSave = supplierCreator.from(addSupplier);
     return supplierRepository.save(toSave).dto();
   }
 
@@ -29,7 +29,7 @@ public class SupplierFacade {
 
   public FoodDto addFoodToSupplierMenu(AddFoodToMenuDto foodToAdd) {
     checkIfSupplierExists(foodToAdd.getSupplierId());
-    Food food = foodCreator.from(foodToAdd);
+    final Food food = foodCreator.from(foodToAdd);
 
     return foodRepository.save(food).dto();
   }
@@ -41,41 +41,9 @@ public class SupplierFacade {
     return supplier.menuDto(supplierFood);
   }
 
-//  public Page<SupplierDto> findAllSuppliers(PageInfo pageInfo) {
-//    return supplierRepository.findAll(pageInfo.toPageRequest())
-//        .map(Supplier::dto);
-//  }
-
-//  public void checkIfFoodExists(Collection<String> foodIds, String supplierId) {
-//    getSupplier(new ObjectId(supplierId));
-//    final long foundFoodSize = foodRepository.findAllById(foodIds).stream()
-//        .filter(food -> food.getSupplierId().equals(supplierId))
-//        .count();
-//    if (foundFoodSize != foodIds.size()) {
-//      throw new FoodNotFound("Can not find food");
-//    }
-//  }
-//
-  public void checkIfSupplierExists(String supplierId) {
+  private void checkIfSupplierExists(String supplierId) {
     getSupplier(new ObjectId(supplierId));
   }
-
-//  public List<SupplierDto> getSuppliersByIds(Collection<Long> supplierIds) {
-//    return supplierRepository.findAllById(supplierIds).stream()
-//        .map(Supplier::dto)
-//        .collect(toList());
-//  }
-
-//  public List<FoodDto> getFoodByIds(Collection<String> foodIds) {
-//    return foodRepository.findAllById(foodIds).stream()
-//        .map(Food::dto)
-//        .collect(toList());
-//  }
-
-//  public Page<FoodDto> getSupplierFood(long supplierId, PageInfo pageInfo) {
-//    return foodRepository.findAllBySupplierId(supplierId, pageInfo.toPageRequest())
-//        .map(Food::dto);
-//  }
 
   private Supplier getSupplier(ObjectId supplierId) {
     return supplierRepository.findById(supplierId)

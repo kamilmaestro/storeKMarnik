@@ -13,7 +13,7 @@ class OrderConfiguration {
 
   @Bean
   OrderFacade orderFacade(SupplierFacade supplierFacade, OrderRepository orderRepository) {
-    return new OrderFacade(supplierFacade, orderRepository);
+    return new OrderFacade(orderRepository, new OrderCreator(supplierFacade));
   }
 
 }

@@ -24,25 +24,12 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderFacade {
 
-  SupplierFacade supplierFacade;
   OrderRepository orderRepository;
+  OrderCreator orderCreator;
 
   public OrderDto addOrder(NewOrderDto newOrder) {
-    if (newOrder == null) {
-      throw new InvalidOrderDataException();
-    }
-    final Map<String, FoodDto> existingFoodByIds = supplierFacade.getSupplierMenu(newOrder.getSupplierId())
-        .getMenu()
-        .stream()
-        .collect(Collectors.toMap(FoodDto::getId, Function.identity()));
-    final List<OrderedFood> orderedFood = newOrder.getFood().stream()
-        .filter(food -> existingFoodByIds.containsKey(food.getFoodId()))
-        .map(food -> {
-          final FoodDto foodDto = existingFoodByIds.get(food.getFoodId());
-          return new OrderedFood(food.getFoodId(), new AmountOfFood(food.getAmountOfFood()), foodDto.getPrice());
-        }).collect(Collectors.toList());
-
-    return orderRepository.save(new Order(newOrder.getId(), LoggedUserGetter.getLoggedUserId(), orderedFood))
+    final Order order = orderCreator.from(newOrder);
+    return orderRepository.save(order)
         .dto();
   }
 

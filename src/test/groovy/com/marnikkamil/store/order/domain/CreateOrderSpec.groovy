@@ -56,4 +56,13 @@ class CreateOrderSpec extends Specification implements SampleOrders, SampleSuppl
       thrown(InvalidOrderDataException)
   }
 
+  def "should not create an order without food" () {
+    when: "$ADMIN creates a new order"
+      orderFacade.addOrder(
+          newOrder(ADMIN_ORDER_ID, pizzaSupplier.id, FAKE_FOOD_ID)
+      )
+    then: "order is not created"
+      thrown(InvalidOrderDataException)
+  }
+
 }
